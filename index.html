@@ -18,15 +18,10 @@
     </div>
     <div class="row">
       <div class="left">
-        <h2 class="karta">Karta Hrvatske</h2>
         <div id="map"></div>
       </div>
       <div class="right">
-        <div class="zupanijaPodaci">
-          <p>Zupanija: Brodsko-Posavska</p>
-          <p>Broj stanovnika: 100k</p>
-        </div>
-        <div id="dropdown">
+        <div class="optionsList">
           <select id="options" name="options">
             <option value="brojStanovnika">Broj stanovnika po zupaniji</option>
             <option value="zivorodeni">Broj zivorodenih po zupaniji</option>
@@ -39,37 +34,97 @@
             </option>
           </select>
         </div>
-        <div id="barchart">Tu ce biti barchart</div>
+        <div id="barchart"></div>
+        <div class="zupanijaPodaci" id="zupanijaID">
+          <p id="zupanija"></p>
+          <p id="brojStanovnika"></p>
+        </div>
       </div>
     </div>
     <div class="footer">
       <h2>Footer</h2>
     </div>
     <script>
-      var populationData = [
-        { county: "Grad Zagreb", population: 802762 },
-        { county: "Splitsko-Dalmatinska Zupanija", population: 449610 },
-        { county: "Zagrebacka Zupanija", population: 311416 },
-        { county: "Primorsko-Goranska Zupanija", population: 286677 },
-        { county: "Osjecko-Baranjska Zupanija", population: 283035 },
-        { county: "Istarska Zupanija", population: 208229 },
-        { county: "Zadarska Zupanija", population: 168672 },
-        { county: "Varazdinska Zupanija", population: 168560 },
-
-        { county: "Vukovarsko-Srijemska Zupanija", population: 159213 },
-        { county: "Sisacko-Moslavacka Zupanija", population: 152546 },
-        { county: "Brodsko-Posavska Zupanija", population: 143827 },
-        { county: "Krapinsko-Zagorska Zupanija", population: 126334 },
-        { county: "Dubrovacko-Neretvanska Zupanija", population: 121381 },
-        { county: "Karlovacka Zupanija", population: 118263 },
-        { county: "Medimurska Zupanija", population: 110999 },
-        { county: "Bjelovarsko-Bilogorska Zupanija", population: 109822 },
-        { county: "Koprivnicko-Krizevacka Zupanija", population: 109137 },
-        { county: "Sibensko-Kninska Zupanija", population: 101436 },
-        { county: "Viroviticko-Podravska Zupanija", population: 77086 },
-        { county: "Pozesko-Slavonska Zupanija", population: 69583 },
-        { county: "Licko-Senjska Zupanija", population: 45943 },
+      var data = [
+        { vrsta: "A", broj_objekata: 1 },
+        { vrsta: "A", broj_objekata: 258 },
+        { vrsta: "A", broj_objekata: 52 },
+        { vrsta: "A", broj_objekata: 27 },
+        { vrsta: "A", broj_objekata: 1 },
+        { vrsta: "A", broj_objekata: 4 },
+        { vrsta: "A", broj_objekata: 116 },
+        { vrsta: "A", broj_objekata: 359 },
+        { vrsta: "A", broj_objekata: 2 },
+        { vrsta: "A", broj_objekata: 81 },
+        { vrsta: "A", broj_objekata: 20 },
       ];
+
+      /*Barchart*/
+      var margin = { top: 40, bottom: 70, left: 60, right: 20 };
+      var barchartWidth = 680 - margin.left - margin.right;
+      var barchartHeight = 420 - margin.top - margin.bottom;
+      var barPadding = 4;
+      var barWidth = barchartWidth / data.length - barPadding;
+
+      var x = d3.scale
+        .ordinal()
+        .domain(d3.range(data.length))
+        .rangeRoundBands([0, barchartWidth]);
+      var y = d3.scale
+        .linear()
+        .domain([
+          0,
+          d3.max(data, function (d) {
+            return d.broj_objekata;
+          }),
+        ])
+        .range([barchartHeight, 0]);
+
+      var barChartSvg = d3
+        .select("#barchart")
+        .append("svg")
+        .attr("width", barchartWidth + margin.left + margin.right)
+        .attr("height", barchartHeight + margin.bottom + margin.top)
+        .style("background-color", "aqua")
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var xAxis = d3.svg
+        .axis()
+        .scale(x)
+        .orient("bottom")
+        .tickFormat(function (d, i) {
+          return data[i].vrsta;
+        });
+      var yAxis = d3.svg.axis().scale(y).orient("left").ticks(10);
+
+      barChartSvg
+        .append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + barchartHeight + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "middle");
+      barChartSvg.append("g").attr("class", "y axis").call(yAxis);
+
+      var barchart = barChartSvg
+        .selectAll("rect")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("x", function (d, i) {
+          return x(i);
+        })
+        .attr("y", function (d, i) {
+          return y(d.broj_objekata);
+        })
+        .attr("height", function (d) {
+          return barchartHeight - y(d.broj_objekata);
+        })
+        .attr("width", barWidth)
+        .attr("fill", "green");
+
+      /*Map of Croatia*/
       var width = 800;
       var height = 800;
       var projection = d3.geo
@@ -105,23 +160,32 @@
           })
           .attr("d", path)
 
-          .style("fill", "blue")
+          .attr("fill", d3.scale.category10())
           .style("fill-opacity", function (d) {
-            return d.properties.population / 1100000;
+            if (d.properties.gn_name == "Grad Zagreb") return 1;
+            return d.properties.population / 500000;
           })
-          .style("stroke", "gray")
+          .style("stroke", "blue")
           .style("stroke-width", 1)
+          .style("cursor", "pointer")
           .style("stroke-opacity", 1)
           .on("mouseover", function (d) {
-            d3.select("#name").text(d.properties.name);
-            d3.select("#population").text(
-              "Population: " + d.properties.population + " "
+            d3.select("#zupanija").text(d.properties.gn_name);
+            d3.select("#brojStanovnika").text(
+              "Broj stanovnika: " + d.properties.population + " "
             );
+            d3.select(this)
+              .style("stroke-width", 2)
+              .style("stroke", "aqua")
+              .style("fill", "red");
+          })
+          .on("mouseout", function (d) {
+            d3.select(this)
+              .style("stroke-width", 1)
+              .style("stroke", "blue")
+              .style("fill", d3.scale.category10());
           })
           .on("click", function (d) {
-            console.log(
-              "Promijeniti background color diva da bude razlicit od hovera"
-            );
             d3.select("#name").text(d.properties.name);
             d3.select("#population").text(
               "Population: " + d.properties.population + " "

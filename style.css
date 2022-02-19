@@ -9,7 +9,7 @@ body {
 }
 /* Header style*/
 .header {
-  padding: 3px 20px 3px 30px;
+  padding: 1px 20px 1px 30px;
   text-align: left;
   background: #1abc9c;
   color: white;
@@ -28,20 +28,18 @@ body {
 }
 /*Map style*/
 .left {
-  flex: 60%;
-}
-
-.karta {
-  color: #bc1a1a;
-  text-align: center;
-  text-shadow: 2px 2px 4px #000000;
+  flex: 50%;
 }
 
 /*Right */
 
 .right {
-  flex: 40%;
+  flex: 50%;
   padding: 20px;
+}
+
+.optionsList {
+  margin-bottom: 5px;
 }
 
 .zupanijaPodaci {
@@ -49,6 +47,10 @@ body {
   padding: 10px;
   box-shadow: 5px 10px 8px 10px #888888;
   margin-bottom: 30px;
+  text-align: left;
+  background: #1abc9c;
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
 }
 
 #options {
@@ -58,4 +60,16 @@ body {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: #f1f1f1;
+}
+
+/*Barchart*/
+
+.axis {
+  font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
