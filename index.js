@@ -146,6 +146,35 @@ function drawBarChart(selectedValue, selectedArray) {
   var yAxis = d3.svg.axis().scale(y).orient("left").ticks(10);
 
   barChartSvg
+    .append("text")
+    .attr("x", barchartWidth / 2)
+    .attr("y", -(margin.top / 2))
+    .attr("font-weight", "bold")
+    .style("font-size", "20px")
+    .style("text-anchor", "middle")
+    .text(selectedValue + " u Hrvatskoj 2020.godine");
+
+  barChartSvg
+    .append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -(barchartHeight / 2))
+    .attr("y", -(margin.left / 2 + 20))
+    .style("text-anchor", "middle")
+    .style("font-size", "13px")
+    .text(selectedValue);
+
+  barChartSvg
+    .append("text")
+    .attr("x", barchartWidth / 2)
+    .attr("y", barchartHeight + margin.bottom / 2)
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Zupanija");
+
+  barChartSvg
     .append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + barchartHeight + ")")
