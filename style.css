@@ -73,3 +73,21 @@ body {
   stroke: #000;
   shape-rendering: crispEdges;
 }
+
+/*Footer*/
+
+.footer {
+  padding: 20px;
+  text-align: center;
+  background: #1abc9c;
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+/*Responsive look*/
+
+@media screen and (max-width: 700px) {
+  .row {
+    flex-direction: column;
+  }
+}

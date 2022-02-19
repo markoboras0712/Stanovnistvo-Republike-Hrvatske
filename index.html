@@ -22,14 +22,14 @@
       </div>
       <div class="right">
         <div class="optionsList">
-          <select id="options" name="options">
-            <option value="brojStanovnika">Broj stanovnika po zupaniji</option>
+          <select id="options" name="options" onchange="selectMenuListener()">
+            <option value="population">Broj stanovnika po zupaniji</option>
             <option value="zivorodeni">Broj zivorodenih po zupaniji</option>
             <option value="umrli">Broj umrlih po zupaniji</option>
-            <option value="sklopljeniBrakovi">
+            <option value="sklopljeni_brakovi">
               Broj sklopljenih brakova po zupaniji
             </option>
-            <option value="razvedeniBrakovi">
+            <option value="razvedeni_brakovi">
               Broj razvedenih brakova po zupaniji
             </option>
           </select>
@@ -42,166 +42,8 @@
       </div>
     </div>
     <div class="footer">
-      <h2>Footer</h2>
+      <h2>Vizualizacija podataka @FERIT Osijek</h2>
     </div>
-    <script>
-      var data = [
-        { vrsta: "A", broj_objekata: 1 },
-        { vrsta: "A", broj_objekata: 258 },
-        { vrsta: "A", broj_objekata: 52 },
-        { vrsta: "A", broj_objekata: 27 },
-        { vrsta: "A", broj_objekata: 1 },
-        { vrsta: "A", broj_objekata: 4 },
-        { vrsta: "A", broj_objekata: 116 },
-        { vrsta: "A", broj_objekata: 359 },
-        { vrsta: "A", broj_objekata: 2 },
-        { vrsta: "A", broj_objekata: 81 },
-        { vrsta: "A", broj_objekata: 20 },
-      ];
-
-      /*Barchart*/
-      var margin = { top: 40, bottom: 70, left: 60, right: 20 };
-      var barchartWidth = 680 - margin.left - margin.right;
-      var barchartHeight = 420 - margin.top - margin.bottom;
-      var barPadding = 4;
-      var barWidth = barchartWidth / data.length - barPadding;
-
-      var x = d3.scale
-        .ordinal()
-        .domain(d3.range(data.length))
-        .rangeRoundBands([0, barchartWidth]);
-      var y = d3.scale
-        .linear()
-        .domain([
-          0,
-          d3.max(data, function (d) {
-            return d.broj_objekata;
-          }),
-        ])
-        .range([barchartHeight, 0]);
-
-      var barChartSvg = d3
-        .select("#barchart")
-        .append("svg")
-        .attr("width", barchartWidth + margin.left + margin.right)
-        .attr("height", barchartHeight + margin.bottom + margin.top)
-        .style("background-color", "aqua")
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-      var xAxis = d3.svg
-        .axis()
-        .scale(x)
-        .orient("bottom")
-        .tickFormat(function (d, i) {
-          return data[i].vrsta;
-        });
-      var yAxis = d3.svg.axis().scale(y).orient("left").ticks(10);
-
-      barChartSvg
-        .append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + barchartHeight + ")")
-        .call(xAxis)
-        .selectAll("text")
-        .style("text-anchor", "middle");
-      barChartSvg.append("g").attr("class", "y axis").call(yAxis);
-
-      var barchart = barChartSvg
-        .selectAll("rect")
-        .data(data)
-        .enter()
-        .append("rect")
-        .attr("x", function (d, i) {
-          return x(i);
-        })
-        .attr("y", function (d, i) {
-          return y(d.broj_objekata);
-        })
-        .attr("height", function (d) {
-          return barchartHeight - y(d.broj_objekata);
-        })
-        .attr("width", barWidth)
-        .attr("fill", "green");
-
-      /*Map of Croatia*/
-      var width = 800;
-      var height = 800;
-      var projection = d3.geo
-        .mercator()
-        .center([1, 10])
-        .scale(6000)
-        .translate([17600, 4500])
-        .rotate([-180, 0]);
-      var path = d3.geo.path().projection(projection);
-      var svg = d3
-        .select("#map")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .style("background", "white")
-        .call(d3.behavior.zoom().scaleExtent([0.3, 5]).on("zoom", onZoom))
-        .append("g");
-      d3.select("body").append("div").attr("id", "name");
-
-      d3.select("body").append("div").attr("id", "population");
-
-      d3.json("cro_regv3.json", function (error, cro) {
-        var data = topojson.feature(cro, cro.objects.layer1);
-        console.log("data", data);
-        var states = svg
-          .selectAll("path.county")
-          .data(data.features)
-          .enter()
-          .append("path")
-          .attr("class", "county")
-          .attr("id", function (d) {
-            return d.id;
-          })
-          .attr("d", path)
-
-          .attr("fill", d3.scale.category10())
-          .style("fill-opacity", function (d) {
-            if (d.properties.gn_name == "Grad Zagreb") return 1;
-            return d.properties.population / 500000;
-          })
-          .style("stroke", "blue")
-          .style("stroke-width", 1)
-          .style("cursor", "pointer")
-          .style("stroke-opacity", 1)
-          .on("mouseover", function (d) {
-            d3.select("#zupanija").text(d.properties.gn_name);
-            d3.select("#brojStanovnika").text(
-              "Broj stanovnika: " + d.properties.population + " "
-            );
-            d3.select(this)
-              .style("stroke-width", 2)
-              .style("stroke", "aqua")
-              .style("fill", "red");
-          })
-          .on("mouseout", function (d) {
-            d3.select(this)
-              .style("stroke-width", 1)
-              .style("stroke", "blue")
-              .style("fill", d3.scale.category10());
-          })
-          .on("click", function (d) {
-            d3.select("#name").text(d.properties.name);
-            d3.select("#population").text(
-              "Population: " + d.properties.population + " "
-            );
-          });
-      });
-      function onZoom() {
-        svg.attr(
-          "transform",
-          "translate (" +
-            d3.event.translate +
-            ") scale (" +
-            d3.event.scale +
-            ")"
-        );
-      }
-    </script>
+    <script type="module" src="index.js"></script>
   </body>
 </html>
