@@ -1,0 +1,61 @@
+/* Global style*/
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial;
+  margin: 0;
+}
+/* Header style*/
+.header {
+  padding: 3px 20px 3px 30px;
+  text-align: left;
+  background: #1abc9c;
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.header h1:hover {
+  font-weight: bold;
+  text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
+}
+
+/* Body style*/
+
+.row {
+  display: flex;
+}
+/*Map style*/
+.left {
+  flex: 60%;
+}
+
+.karta {
+  color: #bc1a1a;
+  text-align: center;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+/*Right */
+
+.right {
+  flex: 40%;
+  padding: 20px;
+}
+
+.zupanijaPodaci {
+  border: 1px solid;
+  padding: 10px;
+  box-shadow: 5px 10px 8px 10px #888888;
+  margin-bottom: 30px;
+}
+
+#options {
+  width: 100%;
+  padding: 16px 20px;
+  border: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+}
